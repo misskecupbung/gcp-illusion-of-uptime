@@ -1,0 +1,17 @@
+# GCP Project Configuration
+project_id = "your-project-id-here"
+
+# Region and zones for deployment
+region = "us-central1"
+zones  = ["us-central1-a", "us-central1-b", "us-central1-c"]
+
+# Instance configuration
+instance_count = 3
+machine_type   = "e2-micro"
+
+# Health check configuration
+health_check_interval  = 5
+health_check_timeout   = 5
+unhealthy_threshold    = 2
+healthy_threshold      = 2
+auto_healing_initial_delay = 60
