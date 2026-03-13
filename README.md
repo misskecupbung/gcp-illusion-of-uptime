@@ -1,7 +1,5 @@
 # The Illusion of 100% Uptime
 
-**45 minutes | Easy-Medium | GCP | ~$1**
-
 > Note: This lab has some production features (IAM, monitoring, Cloud Armor) but still uses HTTP instead of HTTPS. It's good for learning, better than a basic demo, but not fully production-ready.
 
 ## What's this about?
@@ -138,5 +136,3 @@ gcloud compute forwarding-rules list
 - [Google SRE Book](https://sre.google/sre-book/embracing-risk/)
 
 **License:** MIT
-
-- [Google SRE Book](https://sre.google/sre-book/embracing-risk/)
