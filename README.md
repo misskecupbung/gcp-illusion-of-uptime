@@ -117,25 +117,6 @@ One VM gives you 99.9% uptime - roughly 9 hours of downtime per year. Three VMs 
 
 That's the whole trick. Things break constantly but users never notice.
 
-## Problems?
-
-**APIs won't enable:** Make sure billing is enabled on your project.
-
-**502 errors:** Wait 2-3 minutes after deployment. Instances need time to boot.
-
-**Can't SSH:** Run `gcloud compute config-ssh` first.
-
-**App won't start:** The Python app runs on port 8080, nginx forwards from port 80. Check both:
-```bash
-sudo systemctl status nginx
-sudo systemctl status uptime-app
-```
-
-**Check health:**
-```bash
-gcloud compute backend-services get-health uptime-backend-service --global
-```
-
 ## Cleanup
 
 Don't forget this or you'll get a bill.
@@ -153,37 +134,7 @@ gcloud compute forwarding-rules list
 
 Cost is about $0.09/hour. If you forget to destroy, it costs ~$68/month.
 
-## What you learned
-
-1. Multiple copies across different zones = your app stays up
-2. Health checks find problems fast
-3. Auto-healing fixes problems automatically
-4. Real systems fail all the time, but users don't see it
-
-## What's in this lab
-
-This lab includes some good production practices:
-- App runs as a regular user (not root)
-- Nginx handles the web traffic (better than having Python do it directly)
-- IAM service account with limited permissions
-- Cloud Armor for DDoS protection
-- Monitoring and alerts
-- Proper logging
-
-## What's missing
-
-For a real production app, you'd still need:
-- HTTPS (this uses HTTP only - would need a domain and certificates)
-- Custom VPC with private subnets
-- Authentication (add OAuth or IAP)
-- Database (this app doesn't save anything)
-- CI/CD pipeline
-- Auto-scaling (this uses fixed 3 instances)
-- Multi-region setup
-
-So this is better than a basic demo but not fully production-ready. Good enough to learn from though.
-
-## More reading
+## Resources
 
 - [GCP High Availability docs](https://cloud.google.com/architecture/scalable-and-resilient-apps)
 - [Google SRE Book](https://sre.google/sre-book/embracing-risk/)
