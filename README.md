@@ -29,10 +29,16 @@ The difference is huge.
 
 ## Setup
 
-### Step 1: Enable APIs
+### Step 1: Clone the repo
 
 ```bash
+git clone https://github.com/misskecupbung/gcp-illusion-of-uptime.git
 cd gcp-illusion-of-uptime
+```
+
+### Step 2: Enable APIs
+
+```bash
 export PROJECT_ID="your-project-id"
 gcloud config set project $PROJECT_ID
 gcloud services enable compute.googleapis.com cloudresourcemanager.googleapis.com monitoring.googleapis.com
@@ -40,7 +46,7 @@ gcloud services enable compute.googleapis.com cloudresourcemanager.googleapis.co
 
 Wait about 30 seconds.
 
-### Step 2: Deploy everything
+### Step 3: Deploy everything
 
 ```bash
 cd terraform
@@ -52,7 +58,7 @@ terraform apply
 
 This creates 3 VM instances, a load balancer, health checks, monitoring, and all the networking. Takes 2-3 minutes after terraform finishes for everything to boot up.
 
-### Step 3: Test it
+### Step 4: Test it
 
 ```bash
 LOAD_BALANCER_IP=$(terraform output -raw load_balancer_ip)
@@ -67,7 +73,7 @@ You should see a webpage. Run the monitor script to watch which instance respond
 
 Each request might hit a different instance. That's the load balancer doing its job.
 
-### Step 4: Break something
+### Step 5: Break something
 
 Now for the interesting part. Let's kill one instance and see what happens.
 
@@ -92,7 +98,7 @@ Within 10 seconds, that instance is marked unhealthy. Load balancer stops sendin
 
 Meanwhile, your app kept working the whole time because the other two instances were still running.
 
-### Step 5: Kill an entire zone
+### Step 6: Kill an entire zone
 
 What if a whole datacenter goes offline?
 
@@ -103,7 +109,7 @@ What if a whole datacenter goes offline?
 
 The app still works. You're running at 66% capacity now, but users can still access it. The two remaining zones handle everything.
 
-### Step 6: The numbers
+### Step 7: The numbers
 
 Here's what happened:
 - Detection time: 10 seconds
