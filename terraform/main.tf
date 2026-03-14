@@ -33,45 +33,7 @@ resource "google_project_iam_member" "monitoring_writer" {
   member  = "serviceAccount:${google_service_account.uptime_sa.email}"
 }
 
-# Cloud Armor security policy
-resource "google_compute_security_policy" "uptime_policy" {
-  name        = "uptime-demo-policy"
-  description = "Basic DDoS protection for uptime demo"
-
-  # Rate limiting rule
-  rule {
-    action   = "rate_based_ban"
-    priority = 1000
-    match {
-      versioned_expr = "SRC_IPS_V1"
-      config {
-        src_ip_ranges = ["*"]
-      }
-    }
-    rate_limit_options {
-      conform_action = "allow"
-      exceed_action  = "deny(429)"
-      enforce_on_key = "IP"
-      rate_limit_threshold {
-        count        = 100
-        interval_sec = 60
-      }
-      ban_duration_sec = 600
-    }
-  }
-
-  # Default rule
-  rule {
-    action   = "allow"
-    priority = 2147483647
-    match {
-      versioned_expr = "SRC_IPS_V1"
-      config {
-        src_ip_ranges = ["*"]
-      }
-    }
-  }
-}
+# Note: Cloud Armor removed - requires paid tier with quota
 
 # Allow HTTP traffic from anywhere
 resource "google_compute_firewall" "allow_http" {
@@ -200,7 +162,6 @@ resource "google_compute_backend_service" "uptime_backend" {
   timeout_sec           = 10
   health_checks         = [google_compute_health_check.uptime_health_check.id]
   load_balancing_scheme = "EXTERNAL"
-  security_policy       = google_compute_security_policy.uptime_policy.id
 
   backend {
     group           = google_compute_region_instance_group_manager.uptime_mig.instance_group

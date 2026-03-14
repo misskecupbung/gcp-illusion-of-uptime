@@ -1,6 +1,6 @@
 # The Illusion of 100% Uptime
 
-> Note: This lab has some production features (IAM, monitoring, Cloud Armor) but still uses HTTP instead of HTTPS. It's good for learning, better than a basic demo, but not fully production-ready.
+> Note: This lab has some production features (IAM, monitoring, systemd hardening) but still uses HTTP instead of HTTPS and runs on free tier (no Cloud Armor). It's good for learning, better than a basic demo, but not fully production-ready.
 
 ## What's this about?
 
@@ -41,7 +41,7 @@ cd gcp-illusion-of-uptime
 ```bash
 export PROJECT_ID="your-project-id"
 gcloud config set project $PROJECT_ID
-gcloud services enable compute.googleapis.com cloudresourcemanager.googleapis.com monitoring.googleapis.com
+gcloud services enable compute.googleapis.com cloudresourcemanager.googleapis.com monitoring.googleapis.com iam.googleapis.com
 ```
 
 Wait about 30 seconds.
@@ -49,14 +49,17 @@ Wait about 30 seconds.
 ### Step 3: Deploy everything
 
 ```bash
-cd terraform
-terraform init
+cd ~/gcp-illusion-of-uptime/terraform
 cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars - put your project_id in there
+sed -i "s/your-project-id-here/$(gcloud config get-value project)/g" terraform.tfvars
+
+terraform init
+terraform plan
 terraform apply
 ```
 
 This creates 3 VM instances, a load balancer, health checks, monitoring, and all the networking. Takes 2-3 minutes after terraform finishes for everything to boot up.
+
 
 ### Step 4: Test it
 
