@@ -38,45 +38,40 @@ class UptimeHandler(BaseHTTPRequestHandler):
             <html>
             <head>
                 <title>Uptime Demo</title>
+                <meta charset="utf-8">
                 <style>
                     body {{
-                        font-family: Arial, sans-serif;
-                        max-width: 800px;
-                        margin: 50px auto;
+                        font-family: -apple-system, sans-serif;
+                        max-width: 600px;
+                        margin: 40px auto;
                         padding: 20px;
-                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                        color: white;
+                        line-height: 1.6;
                     }}
-                    .card {{
-                        background: rgba(255, 255, 255, 0.1);
-                        padding: 30px;
-                        border-radius: 10px;
-                        backdrop-filter: blur(10px);
-                    }}
-                    h1 {{ margin-top: 0; }}
-                    .info {{ 
-                        background: rgba(0, 0, 0, 0.2);
+                    h1 {{ font-size: 24px; }}
+                    .box {{
+                        background: #f5f5f5;
+                        border-left: 4px solid #333;
                         padding: 15px;
-                        border-radius: 5px;
-                        margin: 10px 0;
+                        margin: 20px 0;
                     }}
-                    .status {{ color: #4ade80; font-weight: bold; }}
+                    code {{ 
+                        background: #e8e8e8;
+                        padding: 2px 6px;
+                        font-size: 14px;
+                    }}
                 </style>
             </head>
             <body>
-                <div class="card">
-                    <h1>The Illusion of 100% Uptime</h1>
-                    <p class="status">✓ Service is healthy</p>
-                    <div class="info">
-                        <strong>Instance:</strong> {instance_name}<br>
-                        <strong>Zone:</strong> {zone}<br>
-                        <strong>Hostname:</strong> {hostname}<br>
-                        <strong>Time:</strong> {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-                    </div>
-                    <p>This request is being served by one of several instances behind a load balancer. 
-                    If this instance fails, the load balancer will automatically route your next request to a healthy one.</p>
-                    <p><em>Refresh a few times to see different instances!</em></p>
+                <h1>Uptime Demo</h1>
+                <p>Served by: <code>{instance_name}</code> in <code>{zone}</code></p>
+                <div class="box">
+                    <strong>How it works:</strong><br>
+                    Three servers run behind a load balancer. Each request hits a random server.
+                    If one dies, the others keep serving traffic. You won't even notice.
                 </div>
+                <p>Hostname: {hostname}<br>
+                Time: {datetime.datetime.now().strftime('%H:%M:%S')}</p>
+                <p><small>Refresh to see different servers →</small></p>
             </body>
             </html>
             """
@@ -109,9 +104,9 @@ PYEOF
 # Set ownership
 chown -R appuser:appuser /opt/uptime-app
 
-# Create env file
-echo "export INSTANCE_NAME=$INSTANCE_NAME" > /opt/uptime-app/.env
-echo "export ZONE=$ZONE" >> /opt/uptime-app/.env
+# Create env file (systemd EnvironmentFile format - no 'export')
+echo "INSTANCE_NAME=$INSTANCE_NAME" > /opt/uptime-app/.env
+echo "ZONE=$ZONE" >> /opt/uptime-app/.env
 chown appuser:appuser /opt/uptime-app/.env
 
 # Configure nginx as reverse proxy
