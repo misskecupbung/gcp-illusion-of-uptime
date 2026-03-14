@@ -19,6 +19,8 @@ You'll deploy a simple web app to GCP, then deliberately break things and watch 
 
 We'll run 3 copies of the same app in different datacenters (zones). A load balancer sends traffic to all of them. If one dies, the others keep working.
 
+![img](img/gcp-illusion-of-uptime-arch.png)
+
 Health checks run every 5 seconds. Two failed checks and that instance is marked bad. The load balancer stops sending it traffic. After 60 seconds, the system creates a new instance to replace it.
 
 The math: 
