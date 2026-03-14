@@ -107,7 +107,10 @@ if __name__ == '__main__':
 PYEOF
 
 # Set ownership
-chown -R appuser:appuser /opt/uptime-appopt/uptime-app/.env
+chown -R appuser:appuser /opt/uptime-app
+
+# Create env file
+echo "export INSTANCE_NAME=$INSTANCE_NAME" > /opt/uptime-app/.env
 echo "export ZONE=$ZONE" >> /opt/uptime-app/.env
 chown appuser:appuser /opt/uptime-app/.env
 
@@ -121,7 +124,29 @@ server {
     location / {
         proxy_pass http://127.0.0.1:8080;
         proxy_set_header Host $host;
-     appuser
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    
+    location /health {
+        proxy_pass http://127.0.0.1:8080/health;
+        access_log off;
+    }
+}
+NGINXEOF
+
+ln -sf /etc/nginx/sites-available/uptime-app /etc/nginx/sites-enabled/
+rm -f /etc/nginx/sites-enabled/default
+nginx -t && systemctl restart nginx
+
+# Create systemd service
+cat > /etc/systemd/system/uptime-app.service << 'SERVICEEOF'
+[Unit]
+Description=Uptime Demo Application
+After=network.target
+
+[Service]
+Type=simple
+User=appuser
 Group=appuser
 WorkingDirectory=/opt/uptime-app
 EnvironmentFile=/opt/uptime-app/.env
@@ -136,33 +161,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=/opt/uptime-app/health {
-        proxy_pass http://127.0.0.1:8080/health;
-        access_log off;
-    }
-}
-NGINXEOF
-
-ln -sf /etc/nginx/sites-available/uptime-app /etc/nginx/sites-enabled/
-rm -f /etc/nginx/sites-enabled/default
-nginx -t && systemctl restart nginx
-# Set env vars
-echo "export INSTANCE_NAME=$INSTANCE_NAME" >> /etc/environment
-echo "export ZONE=$ZONE" >> /etc/environment
-
-# Create systemd service
-cat > /etc/systemd/system/uptime-app.service << 'SERVICEEOF'
-[Unit]
-Description=Uptime Demo Application
-After=network.target
-
-[Service]
-Type=simple
-User=root
-EnvironmentFile=/etc/environment
-ExecStart=/usr/bin/python3 /opt/uptime-app.py
-Restart=always
-RestartSec=10
+ReadWritePaths=/opt/uptime-app
 
 [Install]
 WantedBy=multi-user.target
